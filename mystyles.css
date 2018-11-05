@@ -1,0 +1,13 @@
+#myCanvas{
+  border: 2px solid red;
+}
+body{
+  text-align: center;
+}
+
+p{
+  color: blue;
+  font-weight: bold;
+  font-size: 5em;
+  margin-bottom: -10px;
+}
