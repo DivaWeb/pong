@@ -27,6 +27,7 @@ let animate = window.requestAnimationFrame || function(callback){
 	let update = function() {
     player.update();
 		ball.update(player.paddle, computer.paddle);
+		computer.update(ball);
 	};
 
 	let render = function() {
@@ -67,7 +68,7 @@ let animate = window.requestAnimationFrame || function(callback){
 	};
 
 	function Computer() {
-		this.paddle = new Paddle(750, 750, 225, 275);
+		this.paddle = new Paddle(175, 10, 50, 10);
 	};
 
 
@@ -176,5 +177,22 @@ Ball.prototype.update = function(paddle1, paddle2) {
       this.x_speed += (paddle2.x_speed / 2);
       this.y += this.y_speed;
     }
+  }
+};
+
+//Artificle Intelgence
+Computer.prototype.update = function(ball) {
+  var x_pos = ball.x;
+  var diff = -((this.paddle.x + (this.paddle.width / 2)) - x_pos);
+  if(diff < 0 && diff < -3) { // max speed left
+    diff = -5;
+  } else if(diff > 0 && diff > 3) { // max speed right
+    diff = 5;
+  }
+  this.paddle.move(diff, 0);
+  if(this.paddle.x < 0) {
+    this.paddle.x = 0;
+  } else if (this.paddle.x + this.paddle.width > 400) {
+    this.paddle.x = 400 - this.paddle.width;
   }
 };
