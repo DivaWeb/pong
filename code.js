@@ -1,60 +1,115 @@
-const canvas = document.getElementById("myCanvas");
-const ctx = canvas.getContext("2d");
-var x = canvas.width / 2;
-var y = canvas.height /2;
-var radius = 10;
-var startAngle = 2 * Math.PI;
-var endAngle = 4 * Math.PI;
-var counterClockwise = false;
+let animate = window.requestAnimationFrame || function(callback){
+	window.setTimeout(callback, 1000/60) };
+
+	const canvas = document.getElementById("myCanvas");
+	const width = 400;
+	const height = 600;
+	canvas.width = width;
+	canvas.height = height;
+	const ctx = canvas.getContext("2d")
+	const player = new Player();
+	let keysDown = {};
 
 
-ctx.fillStyle = "black";
-ctx.fillRect(0, 0, 800, 500);
+	window.onload = function() {
+		document.body.appendChild(canvas);
+		animate(step);
+	};
 
-//center line
-ctx.beginPath();
-ctx.moveTo(400, 2);
-ctx.lineTo(400, 498);
-ctx.lineWidth = 1;
-ctx.strokeStyle = "gray";
-ctx.stroke();
+	let step = function(){
+		update();
+		render();
+		animate(step);
+	}
 
-//paddles
-//left hand paddle
-ctx.beginPath();
-ctx.moveTo(50, 225);
-ctx.lineTo(50, 275);
-ctx.lineWidth = 15;
-ctx.strokeStyle = "white";
-ctx.stroke();
+	let update = function() {
+    player.update();
+	};
 
-//right hand paddle
-ctx.beginPath();
-ctx.moveTo(750, 225);
-ctx.lineTo(750, 275);
-ctx.lineWidth = 15;
-ctx.strokeStyle = "white";
-ctx.stroke();
+	let render = function() {
+		ctx.fillStyle = "#000000";
+		ctx.fillRect(0,0, width, height);
+		player.render();
+	}
 
-//ball
-ctx.beginPath();
-ctx.arc(x, y, radius, startAngle, endAngle, counterClockwise);
-ctx.lineWidth = 1;
-ctx.fillStyle = "white";
-ctx.fill();
-ctx.strokeStyle = "white";
-ctx.stroke();
 
-//player constructor
-function player (){
+	//center line
+	function drawCenterLine() {
+	ctx.beginPath();
+	ctx.moveTo(400, 2);
+	ctx.lineTo(400, 498);
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "gray";
+	ctx.stroke();
+	}
 
+	function Paddle(x, y, width, height){
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+    this.x_speed = 0;
+		this.y_speed = 0;
+	}
+
+	Paddle.prototype.render = function() {
+		ctx.fillStyle = "#ffffff"
+		ctx.fillRect(this.x, this.y, this.width, this.height);
+	};
+
+	function Player() {
+		this.paddle = new Paddle(175, 580, 50, 10);
+	}
+/*
+	function Computer() {
+		this.paddle = new Paddle(750, 750, 225, 275);
+	}
+*/
+
+Player.prototype.render = function() {
+	this.paddle.render()
 }
 
-//game constructor
-function computer(name){
-  this.name = name;
+/*
+Computer.protypte.render = function(){
+  this.paddle.render();
 }
+*/
 
-function newBall(){
+//Paddle Controls
+window.addEventListener("keydown", function(even){
+	keysDown[event.keyCode] = true;
+});
 
+window.addEventListener("keyup", function(event) {
+	delete keysDown[event.keyCode];
+});
+
+
+Player.prototype.update = function() {
+  for(var key in keysDown) {
+    var value = Number(key);
+    if(value == 37) {
+      this.paddle.move(-4, 0);
+    } else if (value == 39) {
+      this.paddle.move(4, 0);
+    } else {
+      this.paddle.move(0, 0);
+    }
+  }
+};
+
+
+Paddle.prototype.move = function(x, y) {
+  this.x += x;
+  this.y += y;
+  this.x_speed = x;
+  this.y_speed = y;
+  if(this.x < 0) {
+    this.x = 0;
+    this.x_speed = 0;
+  } else if (this.x + this.width > 400) {
+    this.x = 400 - this.width;
+    this.x_speed = 0;
+  }
 }
