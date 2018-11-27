@@ -11,6 +11,9 @@ let animate = window.requestAnimationFrame || function(callback){
 	let keysDown = {};
 	const computer = new Computer();
 	const ball = new Ball(200, 300);
+	let playerScore = 0;
+	let computerScore = 0;
+
 
 
 	window.onload = function() {
@@ -28,6 +31,7 @@ let animate = window.requestAnimationFrame || function(callback){
     player.update();
 		ball.update(player.paddle, computer.paddle);
 		computer.update(ball);
+
 	};
 
 	let render = function() {
@@ -36,6 +40,8 @@ let animate = window.requestAnimationFrame || function(callback){
 		player.render();
 		ball.render();
 		computer.render();
+
+
 	};
 
 
@@ -46,9 +52,10 @@ let animate = window.requestAnimationFrame || function(callback){
 	ctx.lineTo(400, 498);
 	ctx.lineWidth = 1;
 	ctx.strokeStyle = "gray";
-	ctx.stroke();
+
 	}
 
+//player paddle
 	function Paddle(x, y, width, height){
 		this.x = x;
 		this.y = y;
@@ -59,7 +66,7 @@ let animate = window.requestAnimationFrame || function(callback){
 	}
 
 	Paddle.prototype.render = function() {
-		ctx.fillStyle = "#ffffff"
+		ctx.fillStyle = "#ffffff" ;
 		ctx.fillRect(this.x, this.y, this.width, this.height);
 	};
 
@@ -95,6 +102,10 @@ Ball.prototype.render = function(){
 	ctx.arc(this.x, this.y, this.radius, 0 * Math.PI, 2 * Math.PI)
 	ctx.fillStyle = 'white';
 	ctx.fill();
+	ctx.font = "25 verdana";
+	ctx.fillText("Player: " + playerScore, 20, 40);
+	ctx.fillText("Computer: " + computerScore, 200, 40);
+
 };
 
 //Paddle Controls and Ball Controls
@@ -135,11 +146,6 @@ Paddle.prototype.move = function(x, y) {
   }
 }
 
-Ball.prototype.update = function() {
-	this.x += this.x_speed;
-	this.y += this.y_speed;
-};
-
 Ball.prototype.update = function(paddle1, paddle2) {
   this.x += this.x_speed;
   this.y += this.y_speed;
@@ -156,16 +162,51 @@ Ball.prototype.update = function(paddle1, paddle2) {
     this.x_speed = -this.x_speed;
   }
 
-  if(this.y < 0 || this.y > 600) { // a point was scored
+  /*if(this.y < 0 || this.y > 600) { // a point was scored
     this.x_speed = 0;
     this.y_speed = 3;
     this.x = 200;
     this.y = 300;
   }
+*/
 
+ if(this.y < 0){
+	 this.x_speed = 0;
+	 this.y_speed = 3;
+	 this.x = 200;
+	 this.y = 300;
+	 playerScore ++;
+ } else if(this.y > 600){
+		 this.x_speed = 0;
+		this.y_speed = 3;
+		this.x = 200;
+		this.y = 300;
+		computerScore ++;
+	 }
+
+	 if(playerScore === 11 || computerScore === 11){
+		 stop();
+		 //resetPosition()
+		 //playerScore = 0;
+		//computerScore = 0;
+	 }
+
+
+/*if(playerScore === 11){
+	stop();
+	playerScore = 0;
+	computerScore = 0;
+	document.getElementById("winner").innerHTML = "Congrats Player 1 you win!";
+}else if(computerScore === 11){
+	stop();
+	playerScore = 0;
+	playerScore = 0;
+	document.getElementById("winner").innerHTML = "Congrats Computer you win!";
+}
+*/
   if(top_y > 300) {
     if(top_y < (paddle1.y + paddle1.height) && bottom_y > paddle1.y && top_x < (paddle1.x + paddle1.width) && bottom_x > paddle1.x) {
-      // hit the player's paddle
+			// hit the player's paddle
       this.y_speed = -3;
       this.x_speed += (paddle1.x_speed / 2);
       this.y += this.y_speed;
@@ -178,7 +219,7 @@ Ball.prototype.update = function(paddle1, paddle2) {
       this.y += this.y_speed;
     }
   }
-};
+}
 
 //Artificle Intelgence
 Computer.prototype.update = function(ball) {
@@ -195,4 +236,37 @@ Computer.prototype.update = function(ball) {
   } else if (this.paddle.x + this.paddle.width > 400) {
     this.paddle.x = 400 - this.paddle.width;
   }
-};
+}
+
+    function stop() {
+    resetPosition();
+    ball.x_speed = 0;
+    ball.y_speed = 0;
+
+		if(playerScore === 11){
+
+			document.getElementById("winner").innerHTML = "Congrats Player 1 you win!";
+      reset();
+		}else if(computerScore === 11){
+
+			document.getElementById("winner").innerHTML = "Congrats Computer you win!";
+			reset();
+		}
+	};
+
+	 function reset() {
+	 resetPosition();
+	 //this.resetSpeed();
+	 playerScore = 0;
+	 computerScore = 0;
+ };
+
+   function resetPosition() {
+	 this.x = canvas.width / 2;
+	 this.y = canvas.height / 2;
+ };
+
+ /*this.resetSpeed = function() {
+	 this.x_speed = 2;
+	 this.y_speed = -2;
+ }*/
